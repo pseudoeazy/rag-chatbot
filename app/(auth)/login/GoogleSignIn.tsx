@@ -1,5 +1,5 @@
 "use client";
-import { supabase } from "@/lib/supabase-auth";
+import { supabase } from "@/lib/supabase";
 
 const GoogleSignIn = () => {
   const handleLogin = async () => {

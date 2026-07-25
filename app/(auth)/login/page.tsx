@@ -46,25 +46,8 @@ const LoginPage = () => {
             className="font-mono text-[10px] text-center mt-5 leading-relaxed"
             style={{ color: "var(--muted)" }}
           >
-            Simulated sign-in for demo purposes.
             <br />
-            No credentials are collected or sent anywhere.
           </p>
-        </div>
-      </div>
-
-      {/* Signing-in overlay */}
-      <div
-        id="signingInOverlay"
-        className="hidden fixed inset-0 z-50 flex flex-col items-center justify-center gap-4"
-        style={{ background: "rgba(19,36,32,.92)" }}
-      >
-        <div className="spinner" />
-        <div
-          className="font-mono text-xs uppercase tracking-wide"
-          style={{ color: "var(--paper-raised)" }}
-        >
-          Signing in…
         </div>
       </div>
     </div>
