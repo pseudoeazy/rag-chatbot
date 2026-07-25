@@ -1,18 +1,24 @@
+import { type KeyboardEvent } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
 const chatSchema = z.object({
-  message: z
+  question: z
     .string()
-    .min(1, "Message cannot be empty")
+    .min(1, "question cannot be empty")
     .transform((val) => val.trim())
-    .refine((val) => val.length > 0, "Message cannot be empty"),
+    .refine((val) => val.length > 0, "question cannot be empty"),
 });
 
-type ChatFormData = z.infer<typeof chatSchema>;
+export type ChatFormData = z.infer<typeof chatSchema>;
 
-const ChatForm = () => {
+type Props = {
+  // ✅ Explicit type matching for the streaming trigger
+  handleChatSubmit: (question: string) => void;
+};
+
+const ChatForm = ({ handleChatSubmit }: Props) => {
   const {
     register,
     handleSubmit,
@@ -21,13 +27,21 @@ const ChatForm = () => {
   } = useForm<ChatFormData>({
     resolver: zodResolver(chatSchema),
     defaultValues: {
-      message: "",
+      question: "",
     },
   });
 
   const onSubmit = (data: ChatFormData) => {
-    console.log("Submitted Message via Bun runtime:", data.message);
-    reset();
+    // Pass the validated question directly to your streaming transport loop
+    handleChatSubmit(data.question);
+    reset({ question: "" });
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      void handleSubmit(onSubmit)();
+    }
   };
 
   return (
@@ -46,13 +60,11 @@ const ChatForm = () => {
           border: "1px solid var(--line)",
           color: "var(--text)",
         }}
-        {...register("message")}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            handleSubmit(onSubmit)();
-          }
-        }}
+        {...register("question", {
+          required: true,
+          validate: (data) => data.trim().length > 0,
+        })}
+        onKeyDown={handleKeyDown}
       />
       <button
         type="submit"
