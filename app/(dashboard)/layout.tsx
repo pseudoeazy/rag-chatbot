@@ -19,15 +19,7 @@ const DashboardLayout = ({ children }: PropsWithChildren) => {
     return null;
   }
 
-  return (
-    <div
-      id="appRoot"
-      className="min-h-screen flex flex-col"
-      style={{ background: "var(--ink)" }}
-    >
-      {children}
-    </div>
-  );
+  return <div className="min-h-screen flex flex-col bg-ink">{children}</div>;
 };
 
 export default DashboardLayout;

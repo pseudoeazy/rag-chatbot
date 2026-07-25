@@ -33,18 +33,12 @@ const Header = () => {
     >
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
-          <div
-            className="w-8 h-8 rounded-sm flex items-center justify-center font-display font-semibold text-sm"
-            style={{ background: "var(--accent)", color: "var(--ink)" }}
-          >
+          <div className="w-8 h-8 rounded-sm flex items-center justify-center font-display font-semibold text-sm bg-[#b8863a] text-ink">
             A
           </div>
 
           <div>
-            <div
-              className="font-display text-lg leading-none"
-              style={{ color: "var(--paper-raised)" }}
-            >
+            <div className="font-display text-lg leading-none text-paper-raised">
               Archivist
             </div>
 
@@ -60,11 +54,7 @@ const Header = () => {
         <div className="flex items-center gap-2">
           <Button
             id="resetBtn"
-            className="cursor-pointer font-mono text-[11px] uppercase tracking-wide px-2.5 py-1.5 rounded-md border transition-colors"
-            style={{
-              borderColor: "rgba(255,255,255,.15)",
-              color: "rgba(233,228,214,.75)",
-            }}
+            className="cursor-pointer font-mono text-[11px] uppercase tracking-wide px-2.5 py-1.5 rounded-md border transition-colors bg-[#b8863a]"
           >
             Reset demo
           </Button>
