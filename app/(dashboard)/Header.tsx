@@ -26,6 +26,25 @@ const Header = () => {
     .join("")
     .toUpperCase();
 
+  async function handleLogout() {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/cleanup`,
+        {
+          method: "DELETE",
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error(`Server responded with status: ${response.status}`);
+      }
+
+      signOut();
+    } catch (error) {
+      console.error("Failed to delete resource:", error);
+    }
+  }
+
   return (
     <header
       className="shrink-0 border-b"
@@ -119,7 +138,7 @@ const Header = () => {
                 </div>
 
                 <DropdownMenuItem
-                  onClick={signOut}
+                  onClick={handleLogout}
                   id="signOutBtn"
                   className="w-full text-left px-3 py-2 rounded-none font-mono text-[11px] uppercase tracking-wide transition-colors cursor-pointer block select-none outline-none focus:bg-accent focus:text-accent-foreground"
                   style={{

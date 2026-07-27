@@ -1,36 +1,114 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Archivist – Next.js Frontend
 
-## Getting Started
+Archivist is the frontend for a Retrieval-Augmented Generation (RAG) demo application built with **Next.js**. It allows users to authenticate with Google using Supabase, upload documents for ingestion, ask questions about those documents, and receive AI-generated answers from the NestJS backend.
 
-First, run the development server:
+## Features
+
+- Google authentication with Supabase
+- Client-side authentication using an `AuthProvider`
+- PDF document upload
+- AI-powered question answering
+- Streaming responses
+- Responsive UI built with Next.js and React
+- Communicates with the NestJS backend via REST APIs
+
+## Tech Stack
+
+- Next.js 15
+- React
+- TypeScript
+- Supabase Authentication
+- Tailwind CSS
+- shadcn/ui
+
+## Prerequisites
+
+- Node.js 20+
+- Running NestJS backend
+- Supabase project with Google OAuth configured
+
+## Environment Variables
+
+Create a `.env.local` file in the project root.
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3000/api
+
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_publishable_key
+```
+
+## Installation
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Start the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The application will be available at:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+http://localhost:3001
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Authentication
 
-## Learn More
+Authentication is handled by Supabase using **Google OAuth**.
 
-To learn more about Next.js, take a look at the following resources:
+After a successful login:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- The authenticated user is stored in the `AuthProvider`.
+- The Supabase access token is attached to authenticated requests.
+- The NestJS backend validates the JWT before serving protected endpoints.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Backend
 
-## Deploy on Vercel
+This application depends on the NestJS API.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Ensure the backend is running before starting the frontend.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Default API base URL:
+
+```
+http://localhost:3001/api
+```
+
+## Project Structure
+
+```text
+src/
+├── app/
+├── components/
+├── lib/
+└── providers/
+```
+
+## Available Scripts
+
+```bash
+npm run dev       # Start development server
+
+npm run build     # Build production application
+
+npm run start     # Start production server
+
+npm run lint      # Run ESLint
+```
+
+## Demo Notes
+
+This project is intended as a demonstration of a RAG workflow.
+
+During sign-out, the backend removes uploaded demo documents while preserving the default sample document (`RAG_Test_Document.pdf`) so the application always contains a document that can be queried after a fresh login.
+
+## License
+
+This project is provided for demonstration and educational purposes.
