@@ -14,7 +14,6 @@ const chatSchema = z.object({
 export type ChatFormData = z.infer<typeof chatSchema>;
 
 type Props = {
-  // ✅ Explicit type matching for the streaming trigger
   handleChatSubmit: (question: string) => void;
 };
 
@@ -32,7 +31,6 @@ const ChatForm = ({ handleChatSubmit }: Props) => {
   });
 
   const onSubmit = (data: ChatFormData) => {
-    // Pass the validated question directly to your streaming transport loop
     handleChatSubmit(data.question);
     reset({ question: "" });
   };

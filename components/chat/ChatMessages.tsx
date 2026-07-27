@@ -1,7 +1,6 @@
 import { useEffect, useRef, type ClipboardEvent } from "react";
 import ReactMarkDown from "react-markdown";
 
-// 1. Ensure the Message interface accepts the optional sources parameter explicitly
 export interface Message {
   role: "user" | "assistant";
   content: string;
@@ -30,7 +29,7 @@ const ChatMessages = ({ messages }: Props) => {
   return (
     <div
       id="messages"
-      className="flex-1 overflow-y-auto scrollbar-thin px-4 md:px-5 py-4 space-y-4"
+      className="flex-1 overflow-y-auto scrollbar-thin px-4 md:px-5 py-4 space-y-4 "
     >
       <div className="flex flex-col gap-3">
         {messages.map((message, index) => {
@@ -45,15 +44,14 @@ const ChatMessages = ({ messages }: Props) => {
               className={`px-3 py-2 max-w-[85%] md:max-w-md rounded-xl flex flex-col gap-1.5 ${
                 message.role === "user"
                   ? "bg-ink text-paper-raised self-end"
-                  : "bg-[#3f7a73]/[0.12] text-teal self-start" // Clean custom opacity fallback background
+                  : "bg-[#3f7a73]/12 text-teal self-start"
               }`}
             >
               {/* Markdown Processing Output Area */}
-              <div className="prose prose-sm break-words max-w-none">
+              <div className="prose prose-sm wrap-break-word max-w-none">
                 <ReactMarkDown>{message.content || "..."}</ReactMarkDown>
               </div>
 
-              {/* 2. Renders reference document source tags beautifully below assistant messages */}
               {message.role === "assistant" &&
                 message.sources &&
                 message.sources.length > 0 && (

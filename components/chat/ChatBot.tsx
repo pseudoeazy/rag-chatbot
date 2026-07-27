@@ -1,91 +1,174 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
-import { useChat, type UIMessage } from "@ai-sdk/react";
-import { DefaultChatTransport, type JSONValue } from "ai";
+import { useEffect, useState, useRef } from "react";
+
 import ChatMessages, { Message } from "./ChatMessages";
 import ChatForm from "./ChatForm";
-import UploadChatFiles from "./UploadChatFiles"; // ✅ Kept independent as requested
+import UploadChatFiles from "./UploadChatFiles";
 import TypingIndicator from "./TypingIndicator";
 import ChatSuggestions from "./ChatSuggestions";
+import { useAuth } from "@/providers/AuthProvider";
 
-// Initialize global audio instances safely
 const popAudio =
   typeof Audio !== "undefined" ? new Audio("/sounds/pop.mp3") : null;
 const notificationAudio =
   typeof Audio !== "undefined" ? new Audio("/sounds/notification.wav") : null;
 
+const apiURL = `${process.env.NEXT_PUBLIC_API_URL}/api/chatbot/stream`;
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 const ChatBot = () => {
-  // Initialize the transport-based hook architecture from AI SDK v5
-  const { messages, sendMessage, status, error } = useChat({
-    transport: new DefaultChatTransport({
-      api: "http://localhost:3001/api/chatbot/stream",
-    }),
-  });
+  const { accessToken } = useAuth();
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  // Track status transitions safely across renders to trigger completion chimes
-  const previousStatusRef = useRef<string>("ready");
+  const abortControllerRef = useRef<AbortController | null>(null);
 
+  // Clean up ongoing connections when component unmounts
   useEffect(() => {
-    // Detect the exact transition point from active streaming back to complete
-    if (previousStatusRef.current === "streaming" && status === "ready") {
-      if (notificationAudio) {
-        notificationAudio.currentTime = 0;
-        notificationAudio
-          .play()
-          .catch((err: unknown) => console.log("Audio blocked:", err));
+    return () => {
+      if (abortControllerRef.current) abortControllerRef.current.abort();
+    };
+  }, []);
+
+  // Updates the last message object directly inside the React State Array
+  function updateLatestAssistantMessage(token: string, newSources?: string[]) {
+    setMessages((prevMessages) => {
+      if (prevMessages.length === 0) return prevMessages;
+
+      const updated = [...prevMessages];
+      const lastIndex = updated.length - 1;
+      const lastMessage = updated[lastIndex];
+
+      if (lastMessage.role === "assistant") {
+        updated[lastIndex] = {
+          ...lastMessage,
+          // Append the token to the text string, or preserve existing text
+          content: token
+            ? (lastMessage.content || "") + token
+            : lastMessage.content || "",
+          // Merges sources smoothly when the event package fires
+          sources: newSources ? newSources : lastMessage.sources,
+        };
       }
-    }
+      return updated;
+    });
+  }
 
-    // Cache current status for the next render evaluation pass
-    previousStatusRef.current = status;
-  }, [status]);
-
-  // Strictly type and map messages by extracting text chunks and custom metadata from message parts
-  const combinedMessages: Message[] = messages.map(
-    (msg: UIMessage): Message => {
-      let extractedSources: string[] = [];
-      let extractedText = "";
-
-      // AI SDK v5 requires extracting all content and custom data directly out of the parts array
-      if (msg.parts && Array.isArray(msg.parts)) {
-        // 1. Gather all standard plain text chunks safely
-        msg.parts.forEach((part) => {
-          if (part.type === "text" && typeof part.text === "string") {
-            extractedText += part.text;
+  function handleParsedSSE(event: string, data: string) {
+    switch (event) {
+      case "sources":
+        try {
+          const parsedSources = JSON.parse(data) as string[];
+          // Map sources directly to the current streaming item property instead of a root state hook
+          updateLatestAssistantMessage("", parsedSources);
+        } catch (error) {
+          console.error("Failed to parse sources data JSON: ", error);
+        }
+        break;
+      case "token":
+        try {
+          const token = JSON.parse(data);
+          if (token) {
+            updateLatestAssistantMessage(token);
           }
-        });
+        } catch {
+          updateLatestAssistantMessage(data);
+        }
+        break;
+      case "done":
+        setIsGenerating(false);
+        if (notificationAudio) {
+          notificationAudio.currentTime = 0;
+          notificationAudio
+            .play()
+            .catch((err) => console.log("Audio blocked:", err));
+        }
+        break;
+      default:
+        break;
+    }
+  }
 
-        // 2. Locate and isolate your custom side-channel backend data structures
-        const customDataPart = msg.parts.find(
-          (
-            part,
-          ): part is { type: "data-custom"; data: Record<string, JSONValue> } =>
-            part.type === "data-custom" &&
-            typeof part.data === "object" &&
-            part.data !== null,
-        );
+  async function fetchTextAsStream(apiURL: string, question: string) {
+    if (abortControllerRef.current) abortControllerRef.current.abort();
+    abortControllerRef.current = new AbortController();
 
-        if (
-          customDataPart?.data?.sources &&
-          Array.isArray(customDataPart.data.sources)
-        ) {
-          extractedSources = customDataPart.data.sources.map((src: JSONValue) =>
-            String(src),
-          );
+    setLoading(true);
+    setIsGenerating(true);
+
+    try {
+      const response = await fetch(apiURL, {
+        signal: abortControllerRef.current.signal,
+        method: "POST",
+        mode: "cors",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "text/event-stream",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ question }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
+      }
+
+      setLoading(false);
+
+      if (!response.body) {
+        console.log(`no response body`);
+        setIsGenerating(false);
+        return;
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let isDone = false;
+      let buffer = "";
+
+      while (!isDone) {
+        const { value, done } = await reader.read();
+        isDone = done;
+
+        if (value) {
+          buffer += decoder.decode(value, { stream: true });
+          const blocks = buffer.split("\n\n");
+          buffer = blocks.pop() || "";
+
+          for (const block of blocks) {
+            if (!block.trim()) continue;
+
+            const lines = block.split("\n");
+            let eventType = "";
+            let dataValue = "";
+
+            for (const line of lines) {
+              if (line.startsWith("event:")) {
+                eventType = line.replace("event:", "").trim();
+              } else if (line.startsWith("data:")) {
+                dataValue = line.replace("data:", "").trim();
+              }
+            }
+
+            handleParsedSSE(eventType, dataValue);
+            await delay(30);
+          }
         }
       }
+    } catch (e: unknown) {
+      if (e instanceof Error && e.name !== "AbortError") {
+        console.error(e);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
 
-      return {
-        role: msg.role === "user" ? "user" : "assistant",
-        content: extractedText, // Satisfies your local ChatMessages structure with pure string tokens
-        sources: extractedSources,
-      };
-    },
-  );
+  const handleChatSubmit = async (question: string): Promise<void> => {
+    if (!question.trim()) return;
 
-  // Form submit callback handler that links Hook Form to Vercel's transport stream
-  const handleChatSubmit = (question: string): void => {
     if (popAudio) {
       popAudio.currentTime = 0;
       popAudio
@@ -93,45 +176,34 @@ const ChatBot = () => {
         .catch((err: unknown) => console.log("Audio blocked:", err));
     }
 
-    // Trigger the Vercel AI SDK v5 execution stream safely
-    void sendMessage({ text: question });
-  };
+    setMessages((prev) => [
+      ...prev,
+      { role: "user", content: question },
+      { role: "assistant", content: "", sources: [] },
+    ]);
 
-  const isStreamingOrSubmitting =
-    status === "submitted" || status === "streaming";
+    fetchTextAsStream(apiURL, question);
+  };
 
   return (
     <section className="flex flex-col w-full mx-auto min-h-0 rounded-none md:rounded-lg overflow-hidden bg-paper">
-      {/* Top Header Section */}
       <div className="flex items-center justify-between gap-2 px-4 md:px-5 py-3 border-b border-line">
         <div className="flex items-center gap-2 min-w-0">
           <span className="font-mono text-[10px] uppercase tracking-wide shrink-0 text-black">
             Talking to Archivist
           </span>
         </div>
-        {/* ✅ Restored back to your exact, self-contained configuration */}
         <UploadChatFiles />
       </div>
 
-      {/* Main Streaming Chat Window */}
-      <ChatMessages messages={combinedMessages} />
+      <ChatMessages messages={messages} />
 
-      {/* Renders loading bubble if waiting on initial server response headers */}
-      {isStreamingOrSubmitting &&
-        messages[messages.length - 1]?.role === "user" && <TypingIndicator />}
+      {(loading || isGenerating) && <TypingIndicator />}
 
-      {/* Suggested Chat prompts */}
+      {/*//TODO: Suggested Chat prompts */}
       <ChatSuggestions />
 
-      {/* Lower Input Controls Section */}
       <div className="px-4 md:px-5 py-3 border-t border-line">
-        {error && (
-          <div className="font-mono text-xs mb-2 px-2.5 py-1.5 rounded-md border-danger border bg-[#b14834]/10 text-danger">
-            {error.message || "Something went wrong, try again!"}
-          </div>
-        )}
-
-        {/* Render your native React Hook Form setup wrapper seamlessly */}
         <ChatForm handleChatSubmit={handleChatSubmit} />
       </div>
     </section>

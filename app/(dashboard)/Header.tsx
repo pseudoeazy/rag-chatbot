@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const Header = () => {
   const { signOut, user, loading } = useAuth();
@@ -32,7 +32,7 @@ const Header = () => {
       style={{ borderColor: "rgba(255,255,255,.08)" }}
     >
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2.5">
+        <Link href="/" className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-sm flex items-center justify-center font-display font-semibold text-sm bg-[#b8863a] text-ink">
             A
           </div>
@@ -49,16 +49,9 @@ const Header = () => {
               Retrieval demo
             </div>
           </div>
-        </div>
+        </Link>
 
         <div className="flex items-center gap-2">
-          <Button
-            id="resetBtn"
-            className="cursor-pointer font-mono text-[11px] uppercase tracking-wide px-2.5 py-1.5 rounded-md border transition-colors bg-[#b8863a]"
-          >
-            Reset demo
-          </Button>
-
           <div className="relative">
             <DropdownMenu>
               <DropdownMenuTrigger>

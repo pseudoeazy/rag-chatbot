@@ -157,6 +157,21 @@
   }
 }
 
+@layer utilities {
+  /* Restricts the bounce height specifically for a professional, tight chat bubble feel */
+  @keyframes bounce {
+    0%,
+    100% {
+      transform: translateY(-25%);
+      animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+    50% {
+      transform: translateY(0);
+      animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+  }
+}
+
 /* custom project styles*/
 html,
 body {
