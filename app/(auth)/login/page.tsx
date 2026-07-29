@@ -1,5 +1,5 @@
-import AppIcon from "@/components/AppIcon";
 import GoogleSignIn from "./GoogleSignIn";
+import Image from "next/image";
 
 const LoginPage = () => {
   return (
@@ -9,7 +9,12 @@ const LoginPage = () => {
     >
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center text-center mb-7">
-          <AppIcon />
+          <Image
+            src={`/logo.png`}
+            width={64}
+            height={64}
+            alt="Archivist Logo"
+          />
           <div
             className="font-display text-2xl"
             style={{ color: "var(--paper-raised)" }}
