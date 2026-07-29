@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
+import AppIcon from "@/components/AppIcon";
 
 const Header = () => {
   const { signOut, user, loading } = useAuth();
@@ -52,9 +53,7 @@ const Header = () => {
     >
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between gap-3">
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-sm flex items-center justify-center font-display font-semibold text-sm bg-[#b8863a] text-ink">
-            A
-          </div>
+          <AppIcon />
 
           <div>
             <div className="font-display text-lg leading-none text-paper-raised">

@@ -8,6 +8,7 @@ import UploadChatFiles from "./UploadChatFiles";
 import TypingIndicator from "./TypingIndicator";
 import ChatSuggestions from "./ChatSuggestions";
 import { useAuth } from "@/providers/AuthProvider";
+import Disclaimer from "../Disclaimer";
 
 const popAudio =
   typeof Audio !== "undefined" ? new Audio("/sounds/pop.mp3") : null;
@@ -203,8 +204,11 @@ const ChatBot = () => {
       {/*//TODO: Suggested Chat prompts */}
       <ChatSuggestions />
 
-      <div className="px-4 md:px-5 py-3 border-t border-line">
+      <div className="px-4 md:px-5 py-3  border-t border-line">
         <ChatForm handleChatSubmit={handleChatSubmit} />
+        <div className="pt-3">
+          <Disclaimer />
+        </div>
       </div>
     </section>
   );

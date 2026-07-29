@@ -115,7 +115,7 @@ const UploadChatFiles = () => {
       <DialogContent className="bg-(--paper-raised) border-(--line) text-(--text) sm:max-w-106.25">
         <DialogHeader>
           <DialogTitle className="font-mono text-lg text-(--ink) uppercase tracking-wide">
-            Ingest Knowledge File
+            Ingest your own knowledge file
           </DialogTitle>
           <DialogDescription className="text-black text-xs mt-1">
             Upload custom data documents to target the chatbot&apos;s context.
@@ -138,17 +138,6 @@ const UploadChatFiles = () => {
             <strong className="text-(--ink)"> single-page files</strong> or
             small snippets. Heavy payloads exhaust system tokens faster.
           </p>
-        </div>
-
-        <div className="text-xs">
-          <a
-            href="/docs/RAG_Test_Document.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 hover:underline font-medium inline-flex items-center gap-1"
-          >
-            View current system fallback file &rarr;
-          </a>
         </div>
 
         <form onSubmit={handleUpload} className="space-y-4 mt-2">

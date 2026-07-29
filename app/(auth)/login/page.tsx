@@ -1,3 +1,4 @@
+import AppIcon from "@/components/AppIcon";
 import GoogleSignIn from "./GoogleSignIn";
 
 const LoginPage = () => {
@@ -8,12 +9,7 @@ const LoginPage = () => {
     >
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center text-center mb-7">
-          <div
-            className="w-11 h-11 rounded-sm flex items-center justify-center font-display font-semibold text-lg mb-4"
-            style={{ background: "var(--accent)", color: "var(--ink)" }}
-          >
-            A
-          </div>
+          <AppIcon />
           <div
             className="font-display text-2xl"
             style={{ color: "var(--paper-raised)" }}

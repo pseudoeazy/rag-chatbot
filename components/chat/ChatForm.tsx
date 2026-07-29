@@ -52,7 +52,7 @@ const ChatForm = ({ handleChatSubmit }: Props) => {
         id="chatInput"
         rows={1}
         placeholder="Ask a question about the current source…"
-        className="flex-1 resize-none rounded-md px-3 py-2.5 font-display text-[15px] focus:outline-none focus:ring-2 leading-snug"
+        className="flex-1 resize-none rounded-md px-3 py-2.5 font-sans font-display text-[15px] focus:outline-none focus:ring-2 leading-snug"
         style={{
           background: "var(--paper-raised)",
           border: "1px solid var(--line)",
