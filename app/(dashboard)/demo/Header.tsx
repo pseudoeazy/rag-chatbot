@@ -52,7 +52,7 @@ const Header = () => {
       style={{ borderColor: "rgba(255,255,255,.08)" }}
     >
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between gap-3">
-        <Link href="/" className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5">
           <AppIcon />
 
           <div>
@@ -67,7 +67,7 @@ const Header = () => {
               Retrieval demo
             </div>
           </div>
-        </Link>
+        </div>
 
         <div className="flex items-center gap-2">
           <div className="relative">

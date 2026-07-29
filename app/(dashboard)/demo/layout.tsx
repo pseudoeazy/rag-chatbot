@@ -1,8 +1,9 @@
 "use client";
 import { PropsWithChildren, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/providers/AuthProvider";
 import SignInLoader from "@/components/ui/SignInLoader";
-import { useRouter } from "next/navigation";
+import Header from "./Header";
 
 const DashboardLayout = ({ children }: PropsWithChildren) => {
   const router = useRouter();
@@ -19,7 +20,12 @@ const DashboardLayout = ({ children }: PropsWithChildren) => {
     return null;
   }
 
-  return <div className="min-h-screen flex flex-col bg-ink">{children}</div>;
+  return (
+    <div className="min-h-screen flex flex-col bg-ink">
+      <Header />
+      {children}
+    </div>
+  );
 };
 
 export default DashboardLayout;

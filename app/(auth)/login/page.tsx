@@ -1,3 +1,4 @@
+import Link from "next/link";
 import GoogleSignIn from "./GoogleSignIn";
 import Image from "next/image";
 
@@ -9,12 +10,14 @@ const LoginPage = () => {
     >
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center text-center mb-7">
-          <Image
-            src={`/logo.png`}
-            width={64}
-            height={64}
-            alt="Archivist Logo"
-          />
+          <Link href="/">
+            <Image
+              src={`/logo.png`}
+              width={64}
+              height={64}
+              alt="Archivist Logo"
+            />
+          </Link>
           <div
             className="font-display text-2xl"
             style={{ color: "var(--paper-raised)" }}

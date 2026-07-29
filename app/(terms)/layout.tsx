@@ -1,9 +1,9 @@
 import AppIcon from "@/components/AppIcon";
+import Footer from "@/components/Footer";
 import Link from "next/link";
 import { PropsWithChildren } from "react";
 
 const TermsLayout = ({ children }: PropsWithChildren) => {
-  const currentYear = new Date().getFullYear();
   return (
     <div className="min-h-screen bg-[#e9e4d6] text-[#1b1b16] font-sans antialiased selection:bg-[#e8d3aa]">
       <header className="border-b border-[#d3ccb8] bg-[#f3efe3] sticky top-0 z-10 px-6 py-4">
@@ -18,7 +18,7 @@ const TermsLayout = ({ children }: PropsWithChildren) => {
             </span>
           </div>
           <Link
-            href="/"
+            href="/demo"
             className="text-sm font-medium text-[#3f7a73] hover:text-[#132420] transition-colors"
           >
             Back to App
@@ -28,12 +28,7 @@ const TermsLayout = ({ children }: PropsWithChildren) => {
 
       <main className="max-w-4xl mx-auto px-6 py-12 md:py-20">{children}</main>
 
-      <footer className="border-t border-[#d3ccb8] py-8 text-center text-xs text-[#706a5a] font-mono">
-        <p>
-          &copy; {currentYear} Archivist Demo App. Built for evaluation
-          purposes.
-        </p>
-      </footer>
+      <Footer />
     </div>
   );
 };
